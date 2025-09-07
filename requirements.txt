@@ -2,5 +2,8 @@ dash
 supabase
 plotly
 pandas
+dash-bootstrap-components
 scikit-learn
-dotenv
+python-dotenv
+dash-mantine-components
+dash-iconify

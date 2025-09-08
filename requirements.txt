@@ -7,3 +7,4 @@ scikit-learn
 python-dotenv
 dash-mantine-components
 dash-iconify
+pytest

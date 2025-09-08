@@ -1,0 +1,57 @@
+/* Fondo general de la app */
+body {
+    background-color: #f8f9fa;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f8f9fa;
+    padding-top: 10px;      /* 👈 controla la distancia del logo */
+    padding-bottom: 20px;   /* 👈 deja aire antes del footer */
+}
+
+.login-card {
+    width: 420px;
+    padding: 40px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+    margin-top: 10px;       /* 👈 espacio entre logo y card */
+    margin-bottom: auto;    /* 👈 empuja el footer hacia abajo */
+}
+
+.footer-text {
+    margin-top: 30px;       /* 👈 espacio entre card y footer */
+    text-align: center;
+    color: gray;
+    font-size: 0.9rem;
+}
+
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    background-color: #f8f9fa;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: #ffffff;
+    border-right: 1px solid #ddd;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Contenido */
+.content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}

@@ -5,7 +5,6 @@ from src.core.db import supabase
 def get_usuarios():
     try:
         response = supabase.table("usuarios").select("*").execute()
-        print("📋 Usuarios desde supabase:", response.data)
         return response.data or []
     except Exception as e:
         print("❌ Error al traer usuarios:", e)

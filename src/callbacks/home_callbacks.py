@@ -7,7 +7,6 @@ def register_home_callbacks(app):
         prevent_initial_call=False  # se ejecuta al cargar la página
     )
     def mostrar_bienvenida(session_data):
-        print("🟢 Callback home ejecutado. session_data:", session_data)
         if not session_data:
             return "Bienvenido 👋"
         nombre = session_data.get("nombre") or "Usuario"

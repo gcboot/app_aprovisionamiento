@@ -1,8 +1,5 @@
-from dash import html, dcc
+from dash import html
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
-import dash
-
 
 def sidebar():
     return html.Div(
@@ -14,23 +11,34 @@ def sidebar():
             dmc.NavLink(label="📑 Reportes", href="/home/reportes", id="nav-reportes"),
             dmc.NavLink(
                 label="👥 Usuarios", 
-                children =[
+                children=[
                     dmc.NavLink(label="📋 Lista de Usuarios", href="/home/usuarios/lista", id="nav-usuarios-lista"),
                     dmc.NavLink(label="➕ Crear Usuario", href="/home/usuarios/registro", id="nav-usuarios-crear"),
                 ]),
-            dmc.NavLink(label="⚙️ Configuración", href="/home/config", id="nav-config"),
+            dmc.NavLink(
+                label="🛠️ Mantenimientos", 
+                children=[
+                    dmc.NavLink(label="Categorías", href="/home/categorias", id="nav-categorias"),
+                    dmc.NavLink(label="Campañas", href="/home/campanias", id="nav-cmpanias"),
+                ]),
             dmc.Space(h=20),
             dmc.Button("Cerrar Sesión", id="btn-logout", color="red", fullWidth=True),
         ]
     )
 
+def layout_base(content, titulo=None, subtitulo=None):
+    """Envuelve el contenido de cada página con el sidebar y encabezados."""
+    elementos = []
+    if titulo:
+        elementos.append(dmc.Title(titulo, order=2, mb=10))
+    if subtitulo:
+        elementos.append(dmc.Text(subtitulo, c="dimmed", size="sm", mb=20))
+    elementos.append(content)
 
-def layout_base(content):
-    """Envuelve el contenido de cada página con el sidebar."""
     return html.Div(
         className="dashboard-container",
         children=[
             sidebar(),
-            html.Div(className="content", children=[content])
+            html.Div(className="content", children=elementos)
         ]
     )

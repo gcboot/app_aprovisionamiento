@@ -11,5 +11,5 @@ def test_get_usuarios():
         print("📋 Datos devueltos:", response.data)
         assert response.data is not None
     except Exception as e:
-        print("❌ Error al traer usuarios:", e)
+        print("Error al traer usuarios:", e)
         raise

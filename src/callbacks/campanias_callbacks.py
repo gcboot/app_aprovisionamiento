@@ -54,7 +54,7 @@ def register_campanias_callbacks(app):
                         gap="sm",
                         justify="flex-end",
                     ),
-                    style={"textAlign": "right"},
+                    style={"textAlign": "center"},
                 ),
             ])
             for camp in camps

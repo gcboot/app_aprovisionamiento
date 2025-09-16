@@ -9,6 +9,7 @@ def sidebar():
             dmc.NavLink(label="🏠 Inicio", href="/home", id="nav-home"),            
             dmc.NavLink(label="🤖 Predicciones", href="/home/predicciones", id="nav-predicciones"),
             dmc.NavLink(label="📑 Reportes", href="/home/reportes", id="nav-reportes"),
+            dmc.NavLink(label="📋 Inventarios", href="/home/inventario", id="nav-inventario"),
             dmc.NavLink(
                 label="👥 Usuarios", 
                 children=[
@@ -18,8 +19,9 @@ def sidebar():
             dmc.NavLink(
                 label="🛠️ Mantenimientos", 
                 children=[
-                    dmc.NavLink(label="Categorías", href="/home/categorias", id="nav-categorias"),
-                    dmc.NavLink(label="Campañas", href="/home/campanias", id="nav-cmpanias"),
+                    dmc.NavLink(label="Categorías", href="/home/categorias", id="nav-mantenimientos-categorias"),
+                    dmc.NavLink(label="Campañas", href="/home/campanias", id="nav-mantenimientos-campanias"),
+                    dmc.NavLink(label="Productos", href="/home/productos", id="nav-mantenimientos-productos"),
                 ]),
             dmc.Space(h=20),
             dmc.Button("Cerrar Sesión", id="btn-logout", color="red", fullWidth=True),

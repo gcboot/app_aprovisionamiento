@@ -7,10 +7,14 @@ from src.callbacks.auth_callbacks import register_auth_callbacks
 from src.callbacks.lista_callbacks import register_lista_callbacks
 from src.callbacks.cerrar_sesion_callbacks import register_cerrar_sesion_callbacks
 from src.callbacks.home_callbacks import register_home_callbacks
-
-# Callbacks nuevos
 from src.callbacks import categorias_callbacks
 from src.callbacks import campanias_callbacks   # 👈 lo puedes crear igual que categorias
+from src.callbacks import productos_callbacks
+
+
+# Callbacks nuevos
+from src.callbacks import inventario_callbacks
+
 
 app = Dash(
     __name__,
@@ -38,6 +42,8 @@ register_home_callbacks(app)
 # nuevos mantenimientos
 categorias_callbacks.register_callbacks(app)
 campanias_callbacks.register_campanias_callbacks(app)
+productos_callbacks.register_productos_callbacks(app)
+inventario_callbacks.register_inventario_callbacks(app)
 
 
 # ---------- Run ----------

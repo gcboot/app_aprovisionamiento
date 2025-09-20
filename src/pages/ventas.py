@@ -14,98 +14,109 @@ dash.register_page(
 def layout():
     content = dmc.Container([
 
-        # ---------- Título ----------
-        dmc.Title("Ventas", order=2, mb=20),
+        dmc.Title("Ventas", order=2, mb=30),
 
-        # ---------- Carga CSV ----------
-        dcc.Upload(
-            id="upload-ventas",
-            children=dmc.Button("📂 Cargar CSV de Ventas", color="blue"),
-            multiple=False
-        ),
-        html.Div(id="preview-staging", style={"marginTop": "10px"}),
+        # ---------- Card: Carga y procesamiento ----------
+        dmc.Card(
+            withBorder=True, shadow="sm", radius="md", mb=30,
+            children=[
+                dmc.Title("Carga de ventas (staging)", order=3, mb=15),
 
-        # ---------- Procesar staging ----------
-        dmc.Button(
-            "⚡ Procesar staging",
-            id="btn-procesar-staging",
-            color="green",
-            mt=20
-        ),
-        html.Div(id="resultado-etl", style={"marginTop": "10px"}),
+                dcc.Upload(
+                    id="upload-ventas",
+                    children=dmc.Button("📂 Cargar CSV de Ventas", color="blue"),
+                    multiple=False
+                ),
+                html.Div(id="preview-staging", style={"marginTop": "15px"}),
 
-        # ---------- Ventas ----------
-        dmc.Divider(label="Ventas procesadas", mt=30, mb=10),
-
-        # Filtros ventas
-        dmc.Group([
-            dmc.Select(
-                label="Campaña",
-                placeholder="Selecciona campaña",
-                id="filtro-campania",
-                data=[],          # Se llena desde callback
-                clearable=True
-            ),
-            dmc.Select(
-                label="País",
-                placeholder="Selecciona país",
-                id="filtro-pais",
-                data=[],          # Se llena desde callback
-                clearable=True
-            ),
-            dmc.TextInput(
-                label="Producto",
-                placeholder="Código o nombre",
-                id="filtro-producto"
-            ),
-            dmc.DatePickerInput(
-                label="Rango de Fechas",
-                type="range",
-                id="filtro-fechas"
-            ),
-            dmc.Button("🔍 Filtrar", id="btn-filtrar-ventas", color="blue", mt=22)
-        ], grow=True, mb=20),
-
-        dmc.Paper(
-            shadow="sm", p="md", withBorder=True, radius="md",
-            children=html.Div(id="tabla-ventas")
+                dmc.Button(
+                    "⚡ Procesar staging",
+                    id="btn-procesar-staging",
+                    color="green",
+                    mt=20
+                ),
+                html.Div(id="resultado-etl", style={"marginTop": "10px"})
+            ]
         ),
 
-        # ---------- Eventos ----------
-        dmc.Divider(label="Eventos de venta", mt=30, mb=10),
+        # ---------- Card: Ventas procesadas ----------
+        dmc.Card(
+            withBorder=True, shadow="sm", radius="md", mb=30,
+            children=[
+                dmc.Title("Ventas procesadas", order=3, mb=15),
 
-        # Filtros eventos
-        dmc.Group([
-            dmc.Select(
-                label="Tipo Evento",
-                placeholder="Selecciona tipo",
-                id="filtro-tipo-evento",
-                data=[
-                    {"value": "agotado_web", "label": "Agotado Web"},
-                    {"value": "pedido_bloqueado", "label": "Pedido Bloqueado"}
-                ],
-                clearable=True
-            ),
-            dmc.Select(
-                label="Campaña",
-                placeholder="Selecciona campaña",
-                id="filtro-campania-evento",
-                data=[],          # Se llena desde callback
-                clearable=True
-            ),
-            dmc.TextInput(
-                label="Producto",
-                placeholder="Código o nombre",
-                id="filtro-producto-evento"
-            ),
-            dmc.Button("🔍 Filtrar eventos", id="btn-filtrar-eventos", color="blue", mt=22)
-        ], grow=True, mb=20),
+                dmc.SimpleGrid(
+                    cols=4,
+                    spacing="lg",
+                    children=[
+                        dmc.Select(
+                            label="Campaña",
+                            placeholder="Selecciona campaña",
+                            id="filtro-campania",
+                            data=[], clearable=True
+                        ),
+                        dmc.Select(
+                            label="País",
+                            placeholder="Selecciona país",
+                            id="filtro-pais",
+                            data=[], clearable=True
+                        ),
+                        dmc.TextInput(
+                            label="Producto",
+                            placeholder="Código o nombre",
+                            id="filtro-producto"
+                        ),
+                        dmc.DatePickerInput(
+                            label="Rango de Fechas",
+                            type="range",
+                            id="filtro-fechas"
+                        ),
+                    ]
+                ),
 
-        dmc.Paper(
-            shadow="sm", p="md", withBorder=True, radius="md",
-            children=html.Div(id="tabla-eventos")
+                dmc.Button("🔍 Filtrar", id="btn-filtrar-ventas", color="blue", mt=20),
+                html.Div(id="tabla-ventas")
+            ]
         ),
+
+        # ---------- Card: Eventos ----------
+        dmc.Card(
+            withBorder=True, shadow="sm", radius="md",
+            children=[
+                dmc.Title("Eventos de venta", order=3, mb=15),
+
+                dmc.SimpleGrid(
+                    cols=3,
+                    spacing="lg",
+                    children=[
+                        dmc.Select(
+                            label="Tipo Evento",
+                            placeholder="Selecciona tipo",
+                            id="filtro-tipo-evento",
+                            data=[
+                                {"value": "agotado_web", "label": "Agotado Web"},
+                                {"value": "pedido_bloqueado", "label": "Pedido Bloqueado"}
+                            ],
+                            clearable=True
+                        ),
+                        dmc.Select(
+                            label="Campaña",
+                            placeholder="Selecciona campaña",
+                            id="filtro-campania-evento",
+                            data=[], clearable=True
+                        ),
+                        dmc.TextInput(
+                            label="Producto",
+                            placeholder="Código o nombre",
+                            id="filtro-producto-evento"
+                        ),
+                    ]
+                ),
+
+                dmc.Button("🔍 Filtrar eventos", id="btn-filtrar-eventos", color="blue", mt=20),
+                html.Div(id="tabla-eventos")
+            ]
+        )
     ], fluid=True)
 
-    # 👇 Envolvemos todo con tu layout base
     return layout_base(content)

@@ -3,6 +3,7 @@ import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 from src.models import producto_campania, campanias
 
+
 def register_producto_campania_callbacks(app):
 
     # ---------- Renderizar tabla ----------
@@ -69,9 +70,14 @@ def register_producto_campania_callbacks(app):
     @app.callback(
         Output("tabla-producto-campania", "children", allow_duplicate=True),
         Output("modal-pc", "opened", allow_duplicate=True),
+        Output("hidden-codigo", "value", allow_duplicate=True),
+        Output("hidden-id-campania", "value", allow_duplicate=True),
+        Output("select-producto", "value", allow_duplicate=True),
+        Output("select-campania", "value", allow_duplicate=True),
+        Output("input-precio", "value", allow_duplicate=True),
         Input("btn-save-pc", "n_clicks"),
         State("select-producto", "value"),
-        State("select-campania", "value"),
+        State("select-campania", "value"),   # UUID
         State("input-precio", "value"),
         State("hidden-codigo", "value"),
         State("hidden-id-campania", "value"),
@@ -79,14 +85,31 @@ def register_producto_campania_callbacks(app):
     )
     def save_pc(n_clicks, producto, id_campania, precio, hidden_codigo, hidden_id_campania):
         if not n_clicks:
-            return no_update, False
+            return no_update, False, no_update, no_update, no_update, no_update, no_update
 
+        # Validar datos mínimos
+        if not producto or not id_campania or precio is None:
+            print("❌ Datos incompletos:", producto, id_campania, precio)
+            return no_update, no_update, no_update, no_update, no_update, no_update, no_update
+
+        try:
+            codigo = int(producto)         # producto sigue siendo int
+            id_camp = str(id_campania)     # id_campania es UUID string
+            precio_val = float(precio)
+        except Exception as e:
+            print("❌ Error de conversión:", e)
+            return no_update, no_update, no_update, no_update, no_update, no_update, no_update
+
+        # UPDATE o INSERT
         if hidden_codigo and hidden_id_campania:
-            producto_campania.update_producto_campania(int(producto), id_campania, precio)
+            print("🔄 UPDATE:", codigo, id_camp, precio_val)
+            producto_campania.update_producto_campania(codigo, id_camp, precio_val)
         else:
-            producto_campania.insert_producto_campania(int(producto), id_campania, precio)
+            print("➕ INSERT:", codigo, id_camp, precio_val)
+            producto_campania.insert_producto_campania(codigo, id_camp, precio_val)
 
-        return render_tabla(), False
+        # 👇 Refrescar tabla, cerrar modal y resetear todos los campos
+        return render_tabla(), False, "", "", None, None, None
 
     # ---------- Eliminar ----------
     @app.callback(
@@ -95,13 +118,24 @@ def register_producto_campania_callbacks(app):
         prevent_initial_call=True
     )
     def delete_pc(delete_clicks):
-        if not ctx.triggered_id or not isinstance(ctx.triggered_id, dict):
+        trigger = ctx.triggered_id
+
+        if not trigger or not isinstance(trigger, dict) or trigger.get("type") != "btn-delete":
             return no_update
 
-        codigo, campania, anio = ctx.triggered_id["index"].split("|")
+        idx = trigger.get("index")
+        if not idx:
+            return no_update
+        btn_pos = [i for i, n in enumerate(delete_clicks) if n and n > 0]
+        if not btn_pos:
+            return no_update
+
+        # Ejecutar delete
+        codigo, campania, anio = idx.split("|")
         id_campania = campanias.get_id_by_campania_anio(campania, anio)
         if id_campania:
-            producto_campania.delete_producto_campania(int(codigo), id_campania)
+            print("🗑 DELETE:", codigo, id_campania)
+            producto_campania.delete_producto_campania(int(codigo), str(id_campania))
 
         return render_tabla()
 
@@ -131,25 +165,38 @@ def register_producto_campania_callbacks(app):
         prevent_initial_call=True
     )
     def open_modal_edit(edit_clicks):
-        # Evitar que se dispare al refrescar tabla
-        if not any(edit_clicks):
+        trigger = ctx.triggered_id
+
+        # ✅ Validar que realmente hubo click en un botón edit
+        if (
+            not trigger
+            or not isinstance(trigger, dict)
+            or trigger.get("type") != "btn-edit"
+        ):
             return no_update, no_update, no_update, no_update, no_update, no_update
 
-        if not ctx.triggered_id or not isinstance(ctx.triggered_id, dict):
+        # Confirmar que el botón presionado tiene n_clicks > 0
+        idx = trigger.get("index")
+        if not idx:
+            return no_update, no_update, no_update, no_update, no_update, no_update
+        pos = [i for i, n in enumerate(edit_clicks) if n and n > 0]
+        if not pos:
             return no_update, no_update, no_update, no_update, no_update, no_update
 
-        if ctx.triggered_id.get("type") == "btn-edit":
-            codigo, campania, anio = ctx.triggered_id["index"].split("|")
-            id_campania = campanias.get_id_by_campania_anio(campania, anio)
+        # Extraer datos del botón edit clicado
+        codigo, campania, anio = idx.split("|")
+        id_campania = campanias.get_id_by_campania_anio(campania, anio)
 
-            registros = producto_campania.get_all_producto_campania()
-            pc = next(
-                (r for r in registros if str(r["codigo"]) == codigo and str(r["campania"]) == campania and str(r["anio"]) == anio),
-                None
-            )
+        registros = producto_campania.get_all_producto_campania()
+        pc = next(
+            (r for r in registros if str(r["codigo"]) == codigo
+             and str(r["campania"]) == campania
+             and str(r["anio"]) == anio),
+            None
+        )
 
-            if pc and id_campania:
-                return True, codigo, id_campania, codigo, id_campania, pc["precio_oferta"]
+        if pc and id_campania:
+            return True, str(codigo), str(id_campania), str(codigo), str(id_campania), pc["precio_oferta"]
 
         return no_update, no_update, no_update, no_update, no_update, no_update
 

@@ -7,13 +7,15 @@ from src.callbacks.auth_callbacks import register_auth_callbacks
 from src.callbacks.lista_callbacks import register_lista_callbacks
 from src.callbacks.cerrar_sesion_callbacks import register_cerrar_sesion_callbacks
 from src.callbacks.home_callbacks import register_home_callbacks
-from src.callbacks import categorias_callbacks
-from src.callbacks import campanias_callbacks   # 👈 lo puedes crear igual que categorias
-from src.callbacks import productos_callbacks
-
+from src.callbacks.categorias_callbacks import register_categorias_callbacks
+from src.callbacks.productos_callbacks import register_productos_callbacks
+from src.callbacks.inventario_callbacks import register_inventario_callbacks
+from src.callbacks.producto_campania_callbacks import register_producto_campania_callbacks
 
 # Callbacks nuevos
-from src.callbacks import inventario_callbacks
+# from src.callbacks.promocion_producto_callbacks import register_promocion_producto_callbacks
+
+
 
 
 app = Dash(
@@ -38,12 +40,17 @@ register_auth_callbacks(app)
 register_lista_callbacks(app)
 register_cerrar_sesion_callbacks(app)
 register_home_callbacks(app)
+register_categorias_callbacks(app)
+register_productos_callbacks(app)
+register_inventario_callbacks(app)
+register_producto_campania_callbacks(app)
 
 # nuevos mantenimientos
-categorias_callbacks.register_callbacks(app)
-campanias_callbacks.register_campanias_callbacks(app)
-productos_callbacks.register_productos_callbacks(app)
-inventario_callbacks.register_inventario_callbacks(app)
+# register_promocion_producto_callbacks
+
+
+
+
 
 
 # ---------- Run ----------

@@ -3,7 +3,7 @@ import dash_mantine_components as dmc
 from src.models import categorias
 
 
-def register_callbacks(app):
+def register_categorias_callbacks(app):
 
     # ---------- Renderizar tabla ----------
     def render_tabla():

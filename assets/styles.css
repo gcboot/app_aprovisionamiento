@@ -41,12 +41,17 @@ body {
 /* Sidebar */
 .sidebar {
     width: 250px;
+    height: 100vh;              /* ocupa toda la altura de la ventana */
     background-color: #ffffff;
     border-right: 1px solid #ddd;
     padding: 20px;
+
     display: flex;
     flex-direction: column;
     gap: 15px;
+
+    overflow-y: auto;           /* 👈 permite scroll vertical */
+    overflow-x: hidden;         /* evita scroll horizontal */
 }
 
 /* Contenido */

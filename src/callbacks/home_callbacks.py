@@ -8,6 +8,6 @@ def register_home_callbacks(app):
     )
     def mostrar_bienvenida(session_data):
         if not session_data:
-            return "Bienvenido 👋"
+            return "Bienvenido"
         nombre = session_data.get("nombre") or "Usuario"
-        return f"Bienvenido {nombre} 👋"
+        return f"Bienvenido {nombre}"

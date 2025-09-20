@@ -15,9 +15,11 @@ from src.callbacks.producto_campania_callbacks import (
     register_producto_campania_callbacks,
 )
 from src.callbacks.promociones_callbacks import register_promociones_callbacks
+from src.callbacks.promocion_producto_callbacks import register_promocion_producto_callbacks
 
 # Callbacks nuevos
-from src.callbacks.promocion_producto_callbacks import register_promocion_producto_callbacks
+from src.callbacks.ventas_callbacks import register_ventas_callbacks
+
 
 
 
@@ -49,9 +51,11 @@ register_inventario_callbacks(app)
 register_campanias_callbacks(app)
 register_producto_campania_callbacks(app)
 register_promociones_callbacks(app)
+register_promocion_producto_callbacks(app)
 
 # nuevos mantenimientos
-register_promocion_producto_callbacks(app)
+register_ventas_callbacks(app)
+
 
 
 # ---------- Run ----------

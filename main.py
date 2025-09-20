@@ -10,11 +10,14 @@ from src.callbacks.home_callbacks import register_home_callbacks
 from src.callbacks.categorias_callbacks import register_categorias_callbacks
 from src.callbacks.productos_callbacks import register_productos_callbacks
 from src.callbacks.inventario_callbacks import register_inventario_callbacks
-from src.callbacks.producto_campania_callbacks import register_producto_campania_callbacks
+from src.callbacks.campanias_callbacks import register_campanias_callbacks
+from src.callbacks.producto_campania_callbacks import (
+    register_producto_campania_callbacks,
+)
+from src.callbacks.promociones_callbacks import register_promociones_callbacks
 
 # Callbacks nuevos
-# from src.callbacks.promocion_producto_callbacks import register_promocion_producto_callbacks
-
+from src.callbacks.promocion_producto_callbacks import register_promocion_producto_callbacks
 
 
 
@@ -22,7 +25,7 @@ app = Dash(
     __name__,
     use_pages=True,
     pages_folder="src/pages",
-    suppress_callback_exceptions=True
+    suppress_callback_exceptions=True,
 )
 server = app.server
 
@@ -31,7 +34,7 @@ app.layout = dmc.MantineProvider(
     children=[
         dcc.Store(id="session-store", storage_type="session"),
         dcc.Location(id="url-redirect", refresh=True),  # redirección tras logout
-        dash.page_container
+        dash.page_container,
     ]
 )
 
@@ -43,14 +46,12 @@ register_home_callbacks(app)
 register_categorias_callbacks(app)
 register_productos_callbacks(app)
 register_inventario_callbacks(app)
+register_campanias_callbacks(app)
 register_producto_campania_callbacks(app)
+register_promociones_callbacks(app)
 
 # nuevos mantenimientos
-# register_promocion_producto_callbacks
-
-
-
-
+register_promocion_producto_callbacks(app)
 
 
 # ---------- Run ----------

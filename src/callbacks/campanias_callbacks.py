@@ -1,163 +1,172 @@
-from dash import Input, Output, State, ALL, html, ctx, no_update
+from dash import Input, Output, State, ALL, ctx, no_update, html
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
-from src.models import producto_campania, campanias
+from src.models import campanias
+from datetime import datetime
 
-def register_producto_campania_callbacks(app):
+
+def format_date(date_str):
+    if not date_str:
+        return ""
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d").strftime("%d/%m/%Y")
+    except Exception:
+        return date_str  # fallback si ya viene en otro formato
+
+
+def register_campanias_callbacks(app):
 
     # ---------- Renderizar tabla ----------
-    def render_tabla():
-        registros = producto_campania.get_all_producto_campania()
-        if not registros:
-            return dmc.Alert("No hay registros.", color="yellow", variant="filled")
-
-        rows = []
-        for r in registros:
-            rows.append(
-                html.Tr([
-                    html.Td(r["codigo"]),
-                    html.Td(r["producto"]),
-                    html.Td(f"C{r['campania']} - {r['anio']}"),
-                    html.Td(f"Q{r['precio_oferta']:.2f}"),
-                    html.Td(
-                        dmc.Group([
-                            dmc.ActionIcon(
-                                DashIconify(icon="tabler:edit", width=18),
-                                color="blue",
-                                variant="light",
-                                id={"type": "btn-edit", "index": f"{r['codigo']}|{r['campania']}|{r['anio']}"}
-                            ),
-                            dmc.ActionIcon(
-                                DashIconify(icon="tabler:trash", width=18),
-                                color="red",
-                                variant="light",
-                                id={"type": "btn-delete", "index": f"{r['codigo']}|{r['campania']}|{r['anio']}"}
-                            ),
-                        ])
-                    )
-                ])
+    def render_tabla_campanias():
+        camps = campanias.get_campanias()
+        if not camps:
+            return dmc.Alert(
+                "No hay campañas registradas.",
+                color="yellow",
+                variant="filled",
+                radius="md",
+                mt=10,
             )
 
+        rows = [
+            html.Tr([
+                html.Td(camp["campania"]),
+                html.Td(camp["anio"]),
+                html.Td(format_date(camp.get("fecha_inicio"))),
+                html.Td(format_date(camp.get("fecha_fin"))),
+                html.Td(camp.get("estado", "")),
+                html.Td(
+                    dmc.Group(
+                        [
+                            dmc.Button(
+                                "Editar",
+                                color="blue",
+                                size="xs",
+                                variant="light",
+                                id={"type": "btn-edit-campania", "index": camp["id"]},
+                            ),
+                            dmc.Button(
+                                "Eliminar",
+                                color="red",
+                                size="xs",
+                                variant="outline",
+                                id={"type": "btn-del-campania", "index": camp["id"]},
+                            ),
+                        ],
+                        gap="sm",
+                        justify="flex-end",
+                    ),
+                    style={"textAlign": "right"},
+                ),
+            ])
+            for camp in camps
+        ]
+
         return dmc.Table(
-            [
-                html.Thead(html.Tr([
-                    html.Th("Código"),
-                    html.Th("Producto"),
-                    html.Th("Campaña"),
-                    html.Th("Precio Oferta"),
-                    html.Th("Acciones")
-                ])),
-                html.Tbody(rows)
+            children=[
+                html.Thead(
+                    html.Tr(
+                        [
+                            html.Th("Campaña"),
+                            html.Th("Año"),
+                            html.Th("Fecha inicio"),
+                            html.Th("Fecha fin"),
+                            html.Th("Estado"),
+                            html.Th("Acciones", style={"textAlign": "right"}),
+                        ]
+                    ),
+                    style={"backgroundColor": "#f5f6fa"},
+                ),
+                html.Tbody(rows),
             ],
             striped=True,
             highlightOnHover=True,
             withTableBorder=True,
             withRowBorders=True,
             withColumnBorders=True,
-            mt=20
+            horizontalSpacing="md",
+            verticalSpacing="sm",
+            mt=10,
+            mb=20,
+            style={"borderRadius": "8px", "overflow": "hidden", "textAlign": "center"},
         )
 
-    # ---------- Inicializar tabla ----------
+    # ---------- Actualizar tabla ----------
     @app.callback(
-        Output("tabla-producto-campania", "children"),
-        Input("tabla-producto-campania", "id")  # dispara al cargar
+        Output("campanias_tabla", "children"),
+        Input("campanias_btn_add", "n_clicks"),
+        Input("campanias_trigger_refresh", "data"),
+        Input({"type": "btn-del-campania", "index": ALL}, "n_clicks"),
+        prevent_initial_call=False,
     )
-    def init_tabla(_):
-        return render_tabla()
+    def actualizar_tabla_campanias(_, refresh_trigger, __):
+        triggered = ctx.triggered_id
+        if isinstance(triggered, dict) and "index" in triggered:  # eliminar
+            campanias.delete_campania(triggered["index"])
+        return render_tabla_campanias()
 
-    # ---------- Guardar (Create / Update) ----------
+    # ---------- Manejar modal (crear / editar / guardar) ----------
     @app.callback(
-        Output("tabla-producto-campania", "children", allow_duplicate=True),
-        Output("modal-pc", "opened", allow_duplicate=True),
-        Input("btn-save-pc", "n_clicks"),
-        State("select-producto", "value"),
-        State("select-campania", "value"),
-        State("input-precio", "value"),
-        State("hidden-codigo", "value"),
-        State("hidden-id-campania", "value"),
-        prevent_initial_call=True
+        Output("campanias_modal", "opened"),
+        Output("campanias_input_numero", "value"),   # 👈 Número de campaña
+        Output("campanias_input_anio", "value"),
+        Output("campanias_input_fecha_inicio", "value"),
+        Output("campanias_input_fecha_fin", "value"),
+        Output("campanias_input_estado", "value"),
+        Output("campanias_edit_id", "data"),
+        Output("campanias_notificacion", "children"),
+        Output("campanias_trigger_refresh", "data"),
+        Input("campanias_btn_add", "n_clicks"),
+        Input({"type": "btn-edit-campania", "index": ALL}, "n_clicks"),
+        Input("campanias_btn_save", "n_clicks"),
+        State("campanias_input_numero", "value"),   # 👈 Número de campaña
+        State("campanias_input_anio", "value"),
+        State("campanias_input_fecha_inicio", "value"),
+        State("campanias_input_fecha_fin", "value"),
+        State("campanias_input_estado", "value"),
+        State("campanias_edit_id", "data"),
+        prevent_initial_call=True,
     )
-    def save_pc(n_clicks, producto, id_campania, precio, hidden_codigo, hidden_id_campania):
-        if not n_clicks:
-            return no_update, False
+    def manejar_modal_campanias(n_crear, n_editar, n_guardar,
+                                numero, anio, fecha_inicio, fecha_fin, estado, edit_id):
+        triggered = ctx.triggered_id
 
-        if hidden_codigo and hidden_id_campania:
-            producto_campania.update_producto_campania(int(producto), id_campania, precio)
-        else:
-            producto_campania.insert_producto_campania(int(producto), id_campania, precio)
+        # ➕ CREAR → abrir modal vacío
+        if triggered == "campanias_btn_add":
+            return True, None, "", "", "", "", None, no_update, no_update
 
-        return render_tabla(), False
+        # ✏️ EDITAR → abrir modal con datos existentes
+        if isinstance(triggered, dict) and "index" in triggered and n_editar and any(n_editar):
+            camp = next((c for c in campanias.get_campanias() if c["id"] == triggered["index"]), None)
+            if camp:
+                return True, camp["campania"], camp["anio"], camp.get("fecha_inicio", ""), camp.get("fecha_fin", ""), camp.get("estado", ""), camp["id"], no_update, no_update
 
-    # ---------- Eliminar ----------
-    @app.callback(
-        Output("tabla-producto-campania", "children", allow_duplicate=True),
-        Input({"type": "btn-delete", "index": ALL}, "n_clicks"),
-        prevent_initial_call=True
-    )
-    def delete_pc(delete_clicks):
-        if not ctx.triggered_id or not isinstance(ctx.triggered_id, dict):
-            return no_update
+        # 💾 GUARDAR → insertar o actualizar
+        if triggered == "campanias_btn_save":
+            if not numero:
+                return (
+                    no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+                    dmc.Alert(
+                        "⚠️ El número de campaña es obligatorio",
+                        color="red",
+                        variant="filled",
+                        radius="md",
+                        mt=10,
+                    ),
+                    no_update,
+                )
 
-        codigo, campania, anio = ctx.triggered_id["index"].split("|")
-        id_campania = campanias.get_id_by_campania_anio(campania, anio)
-        if id_campania:
-            producto_campania.delete_producto_campania(int(codigo), id_campania)
+            if edit_id:  # actualizar
+                campanias.update_campania(edit_id, numero, anio, fecha_inicio, fecha_fin, estado)
+                mensaje = "✅ Campaña actualizada con éxito"
+            else:       # insertar
+                campanias.insert_campania(numero, anio, fecha_inicio, fecha_fin, estado)
+                mensaje = "✅ Campaña creada con éxito"
 
-        return render_tabla()
-
-    # ---------- Abrir modal "nuevo" ----------
-    @app.callback(
-        Output("modal-pc", "opened", allow_duplicate=True),
-        Output("hidden-codigo", "value", allow_duplicate=True),
-        Output("hidden-id-campania", "value", allow_duplicate=True),
-        Output("select-producto", "value", allow_duplicate=True),
-        Output("select-campania", "value", allow_duplicate=True),
-        Output("input-precio", "value", allow_duplicate=True),
-        Input("btn-open-modal", "n_clicks"),
-        prevent_initial_call=True
-    )
-    def open_modal_new(n_clicks):
-        return True, "", "", None, None, None
-
-    # ---------- Abrir modal "editar" ----------
-    @app.callback(
-        Output("modal-pc", "opened", allow_duplicate=True),
-        Output("hidden-codigo", "value", allow_duplicate=True),
-        Output("hidden-id-campania", "value", allow_duplicate=True),
-        Output("select-producto", "value", allow_duplicate=True),
-        Output("select-campania", "value", allow_duplicate=True),
-        Output("input-precio", "value", allow_duplicate=True),
-        Input({"type": "btn-edit", "index": ALL}, "n_clicks"),
-        prevent_initial_call=True
-    )
-    def open_modal_edit(edit_clicks):
-        # Evitar que se dispare al refrescar tabla
-        if not any(edit_clicks):
-            return no_update, no_update, no_update, no_update, no_update, no_update
-
-        if not ctx.triggered_id or not isinstance(ctx.triggered_id, dict):
-            return no_update, no_update, no_update, no_update, no_update, no_update
-
-        if ctx.triggered_id.get("type") == "btn-edit":
-            codigo, campania, anio = ctx.triggered_id["index"].split("|")
-            id_campania = campanias.get_id_by_campania_anio(campania, anio)
-
-            registros = producto_campania.get_all_producto_campania()
-            pc = next(
-                (r for r in registros if str(r["codigo"]) == codigo and str(r["campania"]) == campania and str(r["anio"]) == anio),
-                None
+            return (
+                False, None, "", "", "", "", None,
+                dmc.Alert(mensaje, color="green", variant="filled", radius="md", mt=10),
+                True,  # refrescar tabla
             )
 
-            if pc and id_campania:
-                return True, codigo, id_campania, codigo, id_campania, pc["precio_oferta"]
-
-        return no_update, no_update, no_update, no_update, no_update, no_update
-
-    # ---------- Cancelar modal ----------
-    @app.callback(
-        Output("modal-pc", "opened", allow_duplicate=True),
-        Input("btn-close-modal", "n_clicks"),
-        prevent_initial_call=True
-    )
-    def close_modal(n_clicks):
-        return False
+        # 🔴 DEFAULT → no cambia nada
+        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update

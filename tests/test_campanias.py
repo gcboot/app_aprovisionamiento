@@ -2,17 +2,22 @@ import pytest
 from src.models import campanias
 from src.core.db import supabase
 
+
 # 🔹 Fixture: limpiar tabla antes de cada test
 @pytest.fixture(autouse=True)
 def limpiar_campanias():
     # Borra todas las campañas antes de cada test
-    supabase.table("campanias").delete().neq("id", "00000000-0000-0000-0000-000000000000").execute()
+    supabase.table("campanias").delete().neq(
+        "id", "00000000-0000-0000-0000-000000000000"
+    ).execute()
+
 
 # 🔹 Test insertar y consultar campañas
 def test_insert_and_get_campanias():
     campanias.insert_campania(1, 2025, "2025-01-01", "2025-01-31", "cerrada")
     lista = campanias.get_campanias()
     assert any(c["campania"] == 1 and c["anio"] == 2025 for c in lista)
+
 
 # 🔹 Test actualizar campaña
 def test_update_campania():
@@ -25,6 +30,7 @@ def test_update_campania():
     camp2 = next(c for c in lista2 if c["id"] == camp_id)
 
     assert camp2["estado"] == "activa"
+
 
 # 🔹 Test eliminar campaña
 def test_delete_campania():

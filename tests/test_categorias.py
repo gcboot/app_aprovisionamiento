@@ -2,6 +2,7 @@ import pytest
 from src.models import categorias
 from src.core.db import supabase
 
+
 # 🔹 Fixture: limpiar tabla antes de cada test
 @pytest.fixture(autouse=True)
 def limpiar_categorias():
@@ -9,11 +10,13 @@ def limpiar_categorias():
     # Nota: .neq("id", 0) es un truco porque supabase no permite delete() sin filtro.
     # Básicamente borra todos los registros ya que no habrá id = 0.
 
+
 # 🔹 Test insertar y consultar
 def test_insert_and_get_categorias():
     categorias.insert_categoria("Electrónica", "Dispositivos electrónicos")
     lista = categorias.get_categorias()
     assert any(cat["nombre"] == "Electrónica" for cat in lista)
+
 
 # 🔹 Test actualizar
 def test_update_categoria():
@@ -27,6 +30,7 @@ def test_update_categoria():
 
     assert cat2["nombre"] == "Temporal Actualizada"
     assert cat2["descripcion"] == "Cambiado"
+
 
 # 🔹 Test eliminar
 def test_delete_categoria():

@@ -1,91 +1,101 @@
-# import dash
-# from dash import html, dcc
-# import dash_mantine_components as dmc
-# from dash_iconify import DashIconify
-# from src.models import promocion_producto, productos
+import dash
+from dash import html, dcc
+import dash_mantine_components as dmc
+from src.components.layout_base import layout_base
+from src.callbacks.promocion_producto_callbacks import render_tabla
 
-# dash.register_page(
-#     __name__,
-#     path="/home/promocion_producto",
-#     name="Promoción-Producto"
-# )
+# Registrar página
+dash.register_page(__name__, path="/home/promocion_producto", name="Promoción–Producto")
 
+# Layout de la página
+layout = layout_base(
+    dmc.Stack([
 
-# def layout():
-#     # Opciones dinámicas para selects
-#     opciones_promociones = [
-#         {"value": p["id"], "label": f'{p["nombre"]} ({p["tipo"]})'}
-#         for p in promocion_producto.get_all_promociones()
-#     ]
+        # Botón para agregar producto a promoción
+        dmc.Button(
+            "➕ Agregar a Promoción",
+            id="btn-add-promocion-producto",
+            color="teal",
+            variant="filled",
+            radius="md",
+            size="sm",
+            style={"width": "220px", "marginBottom": "10px"}
+        ),
 
-#     opciones_productos = [
-#         {"value": p["codigo"], "label": f'{p["codigo"]} - {p["nombre"]}'}
-#         for p in productos.get_productos()
-#     ]
+        # Mensajes de notificación
+        html.Div(id="promocion_producto_notificacion"),
 
-#     return dmc.Container([
-#         dmc.Group([
-#             dmc.Title("Promoción - Producto", order=2),
-#             dmc.Button(
-#                 "Nueva Relación",
-#                 id="btn-nuevo-promocion-producto",
-#                 leftSection=DashIconify(icon="tabler:plus"),
-#                 color="blue",
-#                 radius="md"
-#             ),
-#         ], justify="space-between", mb=20),
+        # Tabla de promoción-producto (render inicial directo)
+        html.Div(render_tabla(), id="tabla-promocion-producto"),
 
-#         # ---------- Tabla ----------
-#         html.Div(id="tabla-promocion-producto"),
-#         dcc.Store(id="refresh-promocion-producto"),
+        # Modal CRUD Promoción–Producto
+        dmc.Modal(
+            id="modal-promocion-producto",
+            opened=False,
+            title="Asignar Producto a Promoción",
+            centered=True,
+            size="lg",
+            overlayProps={"opacity": 0.55, "blur": 3},
+            children=[
 
-#         # ---------- Modal ----------
-#         dmc.Modal(
-#             id="modal-promocion-producto",
-#             opened=False,
-#             title="Asignar producto a promoción",
-#             size="lg",
-#             centered=True,
-#             children=[
-#                 # Hidden fields para edición
-#                 dcc.Store(id="hidden-id-promocion"),
-#                 dcc.Store(id="hidden-codigo"),
+                # Select dinámicos (se llenan desde callback cargar_selects)
+                dmc.Select(
+                    id="select-promocion",
+                    label="Promoción",
+                    placeholder="Seleccione promoción",
+                    data=[],   # Se llena dinámicamente
+                    searchable=True,
+                    nothingFoundMessage="No se encontró promoción",
+                    mb=10
+                ),
+                dmc.Select(
+                    id="select-producto",
+                    label="Producto",
+                    placeholder="Seleccione producto",
+                    data=[],   # Se llena dinámicamente
+                    searchable=True,
+                    nothingFoundMessage="No se encontró producto",
+                    mb=10
+                ),
 
-#                 dmc.Select(
-#                     id="select-promocion",
-#                     label="Promoción",
-#                     placeholder="Selecciona una promoción",
-#                     data=opciones_promociones,
-#                     searchable=True,
-#                     required=True,
-#                     mb=15
-#                 ),
-#                 dmc.Select(
-#                     id="select-producto",
-#                     label="Producto",
-#                     placeholder="Selecciona un producto",
-#                     data=opciones_productos,
-#                     searchable=True,
-#                     required=True,
-#                     mb=15
-#                 ),
-#                 dmc.NumberInput(
-#                     id="input-cantidad",
-#                     label="Cantidad",
-#                     value=1,
-#                     min=1,
-#                     step=1,
-#                     required=True,
-#                     mb=25
-#                 ),
-#                 dmc.Button(
-#                     "Guardar",
-#                     id="btn-save-promocion-producto",
-#                     fullWidth=True,
-#                     color="blue",
-#                     radius="md",
-#                     size="md"
-#                 )
-#             ]
-#         )
-#     ], fluid=True)
+                # Cantidad
+                dmc.NumberInput(
+                    id="input-cantidad",
+                    label="Cantidad",
+                    required=True,
+                    min=1,
+                    step=1,
+                    value=1,
+                    radius="md",
+                    mb=20
+                ),
+
+                # Botones de acción
+                dmc.Group(
+                    [
+                        dmc.Button(
+                            "Cancelar",
+                            id="btn-close-promocion-producto",
+                            color="red",
+                            variant="light",
+                            radius="md"
+                        ),
+                        dmc.Button(
+                            "Guardar",
+                            id="btn-save-promocion-producto",
+                            color="blue",
+                            radius="md"
+                        )
+                    ],
+                    justify="flex-end",   # ✅ Compatible con dmc 2.2.1
+                    mt=10
+                )
+            ]
+        ),
+
+        # Stores auxiliares
+        dcc.Store(id="hidden-id-promocion"),
+        dcc.Store(id="hidden-codigo")
+    ]),
+    titulo="Mantenimiento Promoción–Producto"
+)

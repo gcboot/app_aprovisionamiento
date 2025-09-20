@@ -37,13 +37,17 @@ layout = layout_base(
                 "blur": 3
             },
             children=[
-                dmc.TextInput(
-                    id="campanias_input_nombre",
-                    label="Nombre de la campaña",
+                # Número de campaña (INT)
+                dmc.NumberInput(
+                    id="campanias_input_numero",   # 👈 corregido
+                    label="Número de campaña",
                     required=True,
+                    min=1,
+                    step=1,
                     radius="md",
                     mb=10
                 ),
+                # Año
                 dmc.NumberInput(
                     id="campanias_input_anio",
                     label="Año",
@@ -51,7 +55,7 @@ layout = layout_base(
                     radius="md",
                     mb=10
                 ),
-                # Fecha inicio (sin props no soportadas)
+                # Fecha inicio
                 dmc.Stack([
                     dmc.Text("Fecha inicio", size="sm"),
                     dmc.DatePicker(
@@ -60,7 +64,7 @@ layout = layout_base(
                         style={"width": "100%"}
                     ),
                 ]),
-                # Fecha fin (sin props no soportadas)
+                # Fecha fin
                 dmc.Stack([
                     dmc.Text("Fecha fin", size="sm"),
                     dmc.DatePicker(
@@ -69,6 +73,7 @@ layout = layout_base(
                         style={"width": "100%"}
                     ),
                 ]),
+                # Estado
                 dmc.Select(
                     id="campanias_input_estado",
                     label="Estado",

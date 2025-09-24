@@ -8,7 +8,12 @@ def sidebar():
             dmc.Title("Nextlytics", order=3, ta="center", c="blue"),
             dmc.NavLink(label="🏠 Inicio", href="/home", id="nav-home"),            
             dmc.NavLink(label="🤖 Predicciones", href="/home/predicciones", id="nav-predicciones"),
-            dmc.NavLink(label="📑 Reportes", href="/home/reportes", id="nav-reportes"),
+            dmc.NavLink(
+                label="📑 Reportes", 
+                children=[
+                    dmc.NavLink(label="📋Ventas Producto", href="/home/dashboard_ventas", id="nav-ventas-producto"),
+                    
+                ]),
             dmc.NavLink(label="📋 Inventarios", href="/home/inventario", id="nav-inventario"),
             dmc.NavLink(
                 label="👥 Usuarios", 

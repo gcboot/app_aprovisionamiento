@@ -15,9 +15,9 @@ def get_promocion(id_promocion: str):
     return query.data
 
 
-def crear_promocion(nombre: str, tipo: str, codigo_padre: int = None):
+def crear_promocion(nombre: str, tipo: str, codigo_padre: int = None, id_campania: str = None):
     """Crea una promoción nueva."""
-    data = {"nombre": nombre, "tipo": tipo, "codigo_padre": codigo_padre}
+    data = {"nombre": nombre, "tipo": tipo, "codigo_padre": codigo_padre, "id_campania": id_campania}
     query = supabase.table(TABLA).insert(data).execute()
     return query.data
 

@@ -1,13 +1,13 @@
 from dash import Input, Output, State, ALL, ctx, no_update, html
 import dash_mantine_components as dmc
-from src.models import categorias
+from src.models import categorias_model
 
 
 def register_categorias_callbacks(app):
 
     # ---------- Renderizar tabla ----------
     def render_tabla():
-        cats = categorias.get_categorias()
+        cats = categorias_model.get_categorias()
         if not cats:
             return dmc.Alert(
                 "No hay categorías registradas.",
@@ -42,7 +42,7 @@ def register_categorias_callbacks(app):
                         gap="sm",
                         justify="flex-end",
                     ),
-                    style={"textAlign": "right"},
+                    style={"textAlign": "center"},
                 ),
             ])
             for cat in cats
@@ -55,7 +55,7 @@ def register_categorias_callbacks(app):
                         [
                             html.Th("Nombre"),
                             html.Th("Descripción"),
-                            html.Th("Acciones", style={"textAlign": "right"}),
+                            html.Th("Acciones", style={"textAlign": "center"}),  # Centrar el encabezado de "Acciones"
                         ]
                     ),
                     style={"backgroundColor": "#f5f6fa"},
@@ -71,7 +71,7 @@ def register_categorias_callbacks(app):
             verticalSpacing="sm",
             mt=10,
             mb=20,
-            style={"borderRadius": "8px", "overflow": "hidden"},
+            style={"borderRadius": "8px", "overflow": "hidden", "textAlign": "center"},
         )
 
     # ---------- Actualizar tabla ----------
@@ -85,7 +85,7 @@ def register_categorias_callbacks(app):
     def actualizar_tabla(_, refresh_trigger, __):
         triggered = ctx.triggered_id
         if isinstance(triggered, dict) and "index" in triggered:  # eliminar
-            categorias.delete_categoria(triggered["index"])
+            categorias_model.delete_categoria(triggered["index"])
         return render_tabla()
 
     # ---------- Manejar modal (crear / editar / guardar) ----------
@@ -113,7 +113,7 @@ def register_categorias_callbacks(app):
 
         # ✏️ EDITAR → abrir modal con datos existentes
         if isinstance(triggered, dict) and "index" in triggered and n_editar and any(n_editar):
-            cat = next((c for c in categorias.get_categorias() if c["id"] == triggered["index"]), None)
+            cat = next((c for c in categorias_model.get_categorias() if c["id"] == triggered["index"]), None)
             if cat:
                 return True, cat["nombre"], cat.get("descripcion", ""), cat["id"], no_update, no_update
 
@@ -133,10 +133,10 @@ def register_categorias_callbacks(app):
                 )
 
             if edit_id:  # actualizar
-                categorias.update_categoria(edit_id, nombre, descripcion)
+                categorias_model.update_categoria(edit_id, nombre, descripcion)
                 mensaje = "✅ Categoría actualizada con éxito"
             else:       # insertar
-                categorias.insert_categoria(nombre, descripcion)
+                categorias_model.insert_categoria(nombre, descripcion)
                 mensaje = "✅ Categoría creada con éxito"
 
             return (

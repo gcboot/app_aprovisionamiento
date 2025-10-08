@@ -1,13 +1,13 @@
 from dash import Input, Output, State, ALL, ctx, no_update, html
 import dash_mantine_components as dmc
-from src.models import productos
+from src.models import productos_model
 from src.core.db import supabase
 
 def register_productos_callbacks(app):
 
     # ---------- Renderizar tabla ----------
     def render_tabla_productos():
-        prods = productos.get_productos()
+        prods = productos_model.get_productos()
         if not prods:
             return dmc.Alert("No hay productos registrados.", color="yellow", variant="filled", radius="md", mt=10)
 
@@ -66,7 +66,7 @@ def register_productos_callbacks(app):
     def actualizar_tabla_productos(_, refresh_trigger, __):
         triggered = ctx.triggered_id
         if isinstance(triggered, dict) and "index" in triggered:
-            productos.delete_producto(triggered["index"])
+            productos_model.delete_producto(triggered["index"])
         return render_tabla_productos()
 
     # ---------- Mostrar/Ocultar campo de producto original ----------
@@ -86,7 +86,7 @@ def register_productos_callbacks(app):
     )
     def cargar_productos_originales(es_original):
         if es_original == "false":
-            originales = productos.get_productos_originales()
+            originales = productos_model.get_productos_originales()
             return [
                 {"label": str(p["codigo"]), "value": p["id"]}
                 for p in originales
@@ -127,7 +127,7 @@ def register_productos_callbacks(app):
 
         # ✏️ EDITAR
         if isinstance(triggered, dict) and "index" in triggered and n_editar and any(n_editar):
-            prod = next((p for p in productos.get_productos() if p["id"] == triggered["index"]), None)
+            prod = next((p for p in productos_model.get_productos() if p["id"] == triggered["index"]), None)
             if prod:
                 return (
                     True,
@@ -163,7 +163,7 @@ def register_productos_callbacks(app):
             es_original_bool = True if es_original == "true" else False
 
             if edit_id:  # actualizar
-                productos.update_producto(edit_id, codigo, nombre, precio,
+                productos_model.update_producto(edit_id, codigo, nombre, precio,
                                           es_original_bool, categoria)
                 mensaje = "✅ Producto actualizado con éxito"
                 new_id = edit_id

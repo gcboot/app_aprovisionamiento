@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nextlytics - Presentación</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: #222;
+      background: url("banner_nextlytics.png") no-repeat center center fixed;
+      background-size: cover;
+      scroll-behavior: smooth;
+    }
+    section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.85); /* fondo blanco semitransparente encima */
+      margin: 0;
+    }
+    h1, h2 {
+      color: #0066cc;
+      margin-bottom: 20px;
+    }
+    p {
+      max-width: 800px;
+      line-height: 1.6;
+      font-size: 1.2rem;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      max-width: 800px;
+      text-align: left;
+    }
+    ul li {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      padding-left: 20px;
+      position: relative;
+    }
+    ul li::before {
+      content: "•";
+      color: #0066cc;
+      position: absolute;
+      left: 0;
+    }
+    canvas {
+      max-width: 600px;
+      max-height: 400px;
+      margin-top: 20px;
+    }
+    .footer {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Portada -->
+  <section>
+    <h1>Nextlytics</h1>
+    <p><strong>Plataforma Predictiva de Aprovisionamiento</strong></p>
+    <p>Especializada en empresas de <strong>venta por catálogo</strong></p>
+    <p>Proyecto de Graduación – Víctor Manuel Cun Pichiya</p>
+  </section>
+
+  <!-- Introducción -->
+  <section>
+    <h2>Introducción</h2>
+    <p>Nextlytics es una plataforma diseñada para optimizar la planeación de inventarios 
+       en empresas de <strong>venta por catálogo</strong>. 
+       Utiliza análisis predictivo y dashboards interactivos para reducir pérdidas y 
+       apoyar decisiones basadas en datos.</p>
+  </section>
+
+  <!-- Problema -->
+  <section>
+    <h2>Contexto y Problema</h2>
+    <ul>
+      <li>Proyecciones manuales sin datos históricos</li>
+      <li>Rupturas de stock y sobreproducción</li>
+      <li>Pérdidas económicas en campañas de catálogo</li>
+    </ul>
+  </section>
+
+  <!-- Solución -->
+  <section>
+    <h2>Solución Conceptual</h2>
+    <ul>
+      <li>Supabase (PostgreSQL) como base de datos</li>
+      <li>Dash en Python para dashboards</li>
+      <li>ETL con Ventas_Raw a partir de CSV</li>
+      <li>Machine Learning para proyecciones</li>
+      <li>VPS Hostinger para despliegue</li>
+      <li>Seguridad: Supabase Auth + roles</li>
+    </ul>
+  </section>
+
+  <!-- Gráficas -->
+  <section>
+    <h2>Ventas Reales vs Proyectadas</h2>
+    <canvas id="ventasChart"></canvas>
+  </section>
+
+  <section>
+    <h2>Inventario Disponible en Campañas</h2>
+    <canvas id="inventarioChart"></canvas>
+  </section>
+
+  <section>
+    <h2>Impacto de Promociones en Catálogo</h2>
+    <canvas id="promoChart"></canvas>
+  </section>
+
+  <!-- Conclusiones -->
+  <section>
+    <h2>Conclusiones y Resultados</h2>
+    <ul>
+      <li>Reducción de costos en 25%</li>
+      <li>Disponibilidad de inventario: 85% → 98%</li>
+      <li>Pérdidas reducidas: Q1.2M → Q600k</li>
+      <li>Arquitectura MVC en Dash</li>
+      <li>Proyecto viable técnica, económica y estratégicamente</li>
+    </ul>
+    <div class="footer">Nextlytics © 2025</div>
+  </section>
+
+  <!-- Script Chart.js -->
+  <script>
+    new Chart(document.getElementById('ventasChart'), {
+      type: 'line',
+      data: {
+        labels: ['C1', 'C2', 'C3', 'C4', 'C5'],
+        datasets: [
+          { label: 'Ventas Reales', data: [800, 1200, 1000, 1500, 1300],
+            borderColor: '#0066cc', backgroundColor: '#0066cc33', tension: 0.3 },
+          { label: 'Proyectadas', data: [900, 1100, 1050, 1400, 1250],
+            borderColor: '#00cc88', backgroundColor: '#00cc8833', borderDash: [5, 5], tension: 0.3 }
+        ]
+      }
+    });
+    new Chart(document.getElementById('inventarioChart'), {
+      type: 'bar',
+      data: {
+        labels: ['C1', 'C2', 'C3', 'C4', 'C5'],
+        datasets: [{ label: 'Inventario %', data: [85, 87, 90, 95, 98], backgroundColor: '#0066cc' }]
+      }
+    });
+    new Chart(document.getElementById('promoChart'), {
+      type: 'pie',
+      data: {
+        labels: ['Ventas con Promoción', 'Ventas Normales'],
+        datasets: [{ data: [60, 40], backgroundColor: ['#0066cc', '#00cc88'] }]
+      }
+    });
+  </script>
+
+</body>
+</html>

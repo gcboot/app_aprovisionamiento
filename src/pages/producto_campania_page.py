@@ -1,7 +1,8 @@
 import dash
 from dash import html
 import dash_mantine_components as dmc
-from src.models import productos, campanias
+from src.models import campanias_model
+from src.models import productos_model
 from src.components.layout_base import layout_base  # tu layout base
 
 # Registrar página con la nueva ruta
@@ -32,7 +33,7 @@ def layout():
                     label="Producto",
                     placeholder="Seleccione producto",
                     data=[{"label": f"{p['nombre']} ({p['codigo']})", "value": str(p["codigo"])}
-                          for p in productos.get_productos()],
+                          for p in productos_model.get_productos()],
                     mb=10,
                     persistence=True
                 ),
@@ -41,7 +42,7 @@ def layout():
                     label="Campaña",
                     placeholder="Seleccione campaña",
                     data=[{"label": f"C{c['campania']} - {c['anio']}", "value": str(c["id"])}
-                          for c in campanias.get_campanias()],
+                          for c in campanias_model.get_campanias()],
                     mb=10,
                     persistence=True
                 ),

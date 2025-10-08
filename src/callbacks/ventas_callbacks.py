@@ -1,6 +1,7 @@
 from dash import Input, Output, State, html, no_update, dash_table
 import dash_mantine_components as dmc
-from src.models import ventas_raw, ventas
+from src.models import ventas_raw_model
+from src.models import ventas_model
 import base64, io, pandas as pd
 
 
@@ -8,7 +9,7 @@ def register_ventas_callbacks(app):
 
     # ---------- Renderizar tabla de ventas ----------
     def render_tabla_ventas(filtros=None):
-        registros = ventas.get_ventas(filtros)
+        registros = ventas_model.get_ventas(filtros)
         if not registros:
             return dmc.Alert("No hay ventas procesadas.", color="yellow", variant="filled")
 
@@ -54,7 +55,7 @@ def register_ventas_callbacks(app):
 
     # ---------- Renderizar tabla de eventos ----------
     def render_tabla_eventos(filtros=None):
-        registros = ventas.get_eventos(filtros)
+        registros = ventas_model.get_eventos(filtros)
         if not registros:
             return dmc.Alert("No hay eventos de venta.", color="yellow", variant="filled")
 
@@ -109,7 +110,7 @@ def register_ventas_callbacks(app):
         decoded = base64.b64decode(content_string).decode("utf-8")
 
         try:
-            df_preview = ventas_raw.cargar_csv_ventas(decoded)
+            df_preview = ventas_raw_model.cargar_csv_ventas(decoded)
         except Exception as e:
             return dmc.Alert(f"Error cargando CSV: {str(e)}", color="red")
 
@@ -132,7 +133,7 @@ def register_ventas_callbacks(app):
         prevent_initial_call=True
     )
     def procesar_etl(n):
-        resumen = ventas.procesar_staging()
+        resumen = ventas_model.procesar_staging()
         return dmc.Alert(
             f"Procesadas {resumen['ventas_insertadas']} ventas y {resumen['eventos_insertados']} eventos.",
             color="blue"

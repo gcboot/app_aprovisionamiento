@@ -1,6 +1,5 @@
 from dash import Input, Output, State, no_update
-from src.models.usuario import login_usuario, crear_usuario, evaluar_password_strength
-from src.models.sesion import guardar_sesion
+from src.models import usuario_model, sesion_model
 
 
 def register_auth_callbacks(app):
@@ -21,7 +20,7 @@ def register_auth_callbacks(app):
         prevent_initial_call=True
     )
     def validar_password_strength(password):
-        score = evaluar_password_strength(password)
+        score = usuario_model.evaluar_password_strength(password)
         if score >= 80:
             return score, "green", "Contraseña fuerte ✅", "green"
         elif score >= 50:
@@ -41,18 +40,18 @@ def register_auth_callbacks(app):
     )
     def login(n, email, password):
         if not email or not password:
-            return "⚠️ Ingrese datos", no_update, no_update
+            return "⚠️ Ingrese sus credenciales", no_update, no_update
 
-        resp = login_usuario(email, password)
+        resp = usuario_model.login_usuario(email, password)
 
         if resp.user:  # ✅ login exitoso
             return (
                 f"Bienvenido ✅ {resp.user.email}",
-                guardar_sesion(resp.user.id, "cliente"),  # 👈 aquí podrías traer rol real de la BD
-                "/home"  # 👈 redirección
+                sesion_model.guardar_sesion(resp.user.id, "cliente"),  # 👈 aquí podrías usar el rol real
+                "/home"
             )
 
-        if resp.error:  # ✅ error explícito
+        if resp.error:
             return f"❌ Error: {resp.error.message}", no_update, no_update
 
         return "❌ Credenciales incorrectas", no_update, no_update
@@ -76,14 +75,16 @@ def register_auth_callbacks(app):
     def registrar(n, nombre, email, password, confirm, rol):
         if not all([nombre, email, password, confirm]):
             return "⚠️ Complete todos los campos", no_update, no_update, no_update, no_update, no_update
+
         if password != confirm:
             return "⚠️ Las contraseñas no coinciden", no_update, no_update, no_update, no_update, no_update
-        if evaluar_password_strength(password) < 50:
+
+        if usuario_model.evaluar_password_strength(password) < 50:
             return "⚠️ La contraseña es demasiado débil", no_update, no_update, no_update, no_update, no_update
 
-        resp = crear_usuario(nombre, email, password, rol)
+        resp = usuario_model.crear_usuario(nombre, email, password, rol)
 
-        if resp.user:  # ✅ usuario creado
+        if resp.user:
             return (
                 "✅ Usuario creado con éxito",
                 "",  # limpiar nombre
@@ -93,7 +94,7 @@ def register_auth_callbacks(app):
                 "cliente"  # reset rol
             )
 
-        if resp.error:  # ✅ error explícito de Supabase
+        if resp.error:
             return f"❌ Error: {resp.error.message}", no_update, no_update, no_update, no_update, no_update
 
         return "❌ No se pudo crear el usuario", no_update, no_update, no_update, no_update, no_update

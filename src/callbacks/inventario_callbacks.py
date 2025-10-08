@@ -1,6 +1,7 @@
 from dash import Input, Output, State, ALL, ctx, no_update, html
 import dash_mantine_components as dmc
-from src.models import inventario, productos
+from src.models import inventario_model
+from src.models import productos_model
 from src.core.db import supabase
 from datetime import datetime
 
@@ -8,7 +9,7 @@ def register_inventario_callbacks(app):
 
     # ---------- Renderizar tabla ----------
     def render_tabla_inventario():
-        inv = inventario.get_inventario()
+        inv = inventario_model.get_inventario()
         if not inv:
             return dmc.Alert("No hay registros de inventario.", color="yellow", variant="filled", radius="md", mt=10)
 
@@ -74,7 +75,7 @@ def register_inventario_callbacks(app):
     def actualizar_tabla_inventario(_, refresh_trigger, __):
         triggered = ctx.triggered_id
         if isinstance(triggered, dict) and "index" in triggered:
-            inventario.delete_inventario(triggered["index"])
+            inventario_model.delete_inventario(triggered["index"])
         return render_tabla_inventario()
 
     # ---------- Cargar productos originales ----------
@@ -84,7 +85,7 @@ def register_inventario_callbacks(app):
         prevent_initial_call=True
     )
     def cargar_productos_originales(_):
-        originales = productos.get_productos_originales()
+        originales = productos_model.get_productos_originales()
         return [
             {"label": f"{p['codigo']} - {p['nombre']}", "value": str(p["codigo"])}
             for p in originales
@@ -124,7 +125,7 @@ def register_inventario_callbacks(app):
 
         # ✏️ EDITAR
         if isinstance(triggered, dict) and "index" in triggered and n_editar and any(n_editar):
-            inv = next((i for i in inventario.get_inventario() if i["id"] == triggered["index"]), None)
+            inv = next((i for i in inventario_model.get_inventario() if i["id"] == triggered["index"]), None)
             if inv:
                 # fecha en formato ISO para el DatePicker
                 fecha_iso = None
@@ -154,10 +155,10 @@ def register_inventario_callbacks(app):
                        dmc.Alert("⚠️ Debe seleccionar un producto original", color="red", variant="filled", radius="md", mt=10), no_update
 
             if edit_id:
-                inventario.update_inventario(edit_id, stock_inicial, stock_actual, stock_minimo, stock_reservado, fecha)
+                inventario_model.update_inventario(edit_id, stock_inicial, stock_actual, stock_minimo, stock_reservado, fecha)
                 mensaje = "✅ Inventario actualizado con éxito"
             else:
-                inventario.insert_inventario(codigo, stock_inicial, stock_actual, stock_minimo, stock_reservado, fecha)
+                inventario_model.insert_inventario(codigo, stock_inicial, stock_actual, stock_minimo, stock_reservado, fecha)
                 mensaje = "✅ Inventario creado con éxito"
 
             return False, None, 0, 0, 0, 0, None, None, \

@@ -1,6 +1,6 @@
 import pytest
 import uuid
-from src.models import ventas
+from models import ventas_model
 
 # UUID de campaña dummy (ya cargado en tabla campanias)
 CAMPANIA_TEST_UUID = "11111111-1111-1111-1111-111111111113"
@@ -8,7 +8,7 @@ CODIGO_PRODUCTO_TEST = 9000000002  # producto dummy en tabla productos
 
 # ---------- Test de conexión ----------
 def test_conexion_supabase():
-    registros = ventas.get_all_ventas()
+    registros = ventas_model.get_all_ventas()
     assert registros is not None, "❌ No se pudo conectar a ventas"
     assert isinstance(registros, list), "❌ El resultado debería ser una lista"
 
@@ -26,7 +26,7 @@ def test_crear_venta():
         "valor_q": 333.00,
     }
 
-    resultado = ventas.crear_venta(nueva)
+    resultado = ventas_model.crear_venta(nueva)
 
     assert resultado is not None, "❌ La inserción falló"
     assert resultado["codigo_venta"] == codigo_unico
@@ -35,7 +35,7 @@ def test_crear_venta():
 
 # ---------- Test de consultas ----------
 def test_get_ventas_filtradas():
-    registros = ventas.get_ventas_por_campania(CAMPANIA_TEST_UUID, pais="GT")
+    registros = ventas_model.get_ventas_por_campania(CAMPANIA_TEST_UUID, pais="GT")
     assert isinstance(registros, list)
     if registros:
         assert "codigo_venta" in registros[0]

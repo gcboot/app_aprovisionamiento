@@ -1,14 +1,15 @@
 from dash import Input, Output, State, ALL, html, ctx, no_update
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
-from src.models import producto_campania, campanias
+from src.models import campanias_model
+from src.models import producto_campania_model
 
 
 def register_producto_campania_callbacks(app):
 
     # ---------- Renderizar tabla ----------
     def render_tabla():
-        registros = producto_campania.get_all_producto_campania()
+        registros = producto_campania_model.get_all_producto_campania()
         if not registros:
             return dmc.Alert("No hay registros.", color="yellow", variant="filled")
 
@@ -103,10 +104,10 @@ def register_producto_campania_callbacks(app):
         # UPDATE o INSERT
         if hidden_codigo and hidden_id_campania:
             print("🔄 UPDATE:", codigo, id_camp, precio_val)
-            producto_campania.update_producto_campania(codigo, id_camp, precio_val)
+            producto_campania_model.update_producto_campania(codigo, id_camp, precio_val)
         else:
             print("➕ INSERT:", codigo, id_camp, precio_val)
-            producto_campania.insert_producto_campania(codigo, id_camp, precio_val)
+            producto_campania_model.insert_producto_campania(codigo, id_camp, precio_val)
 
         # 👇 Refrescar tabla, cerrar modal y resetear todos los campos
         return render_tabla(), False, "", "", None, None, None
@@ -132,10 +133,10 @@ def register_producto_campania_callbacks(app):
 
         # Ejecutar delete
         codigo, campania, anio = idx.split("|")
-        id_campania = campanias.get_id_by_campania_anio(campania, anio)
+        id_campania = campanias_model.get_id_by_campania_anio(campania, anio)
         if id_campania:
             print("🗑 DELETE:", codigo, id_campania)
-            producto_campania.delete_producto_campania(int(codigo), str(id_campania))
+            producto_campania_model.delete_producto_campania(int(codigo), str(id_campania))
 
         return render_tabla()
 
@@ -185,9 +186,9 @@ def register_producto_campania_callbacks(app):
 
         # Extraer datos del botón edit clicado
         codigo, campania, anio = idx.split("|")
-        id_campania = campanias.get_id_by_campania_anio(campania, anio)
+        id_campania = campanias_model.get_id_by_campania_anio(campania, anio)
 
-        registros = producto_campania.get_all_producto_campania()
+        registros = producto_campania_model.get_all_producto_campania()
         pc = next(
             (r for r in registros if str(r["codigo"]) == codigo
              and str(r["campania"]) == campania

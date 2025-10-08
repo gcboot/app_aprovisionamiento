@@ -3,7 +3,7 @@ from dash import html, dcc
 import dash_mantine_components as dmc
 import plotly.express as px
 
-from src.models import ventas
+from src.models import ventas_model
 from src.components.layout_base import layout_base  # tu layout base general
 
 # Registrar página
@@ -15,7 +15,7 @@ dash.register_page(
 
 def layout():
     # ---------- Datos desde Supabase ----------
-    registros = ventas.get_all_ventas()
+    registros = ventas_model.get_all_ventas()
     if not registros:
         return layout_base(
             dmc.Container([

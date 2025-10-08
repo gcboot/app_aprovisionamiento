@@ -1,7 +1,7 @@
 from dash import Input, Output, State, ALL, ctx, no_update, html
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
-from src.models import promociones
+from src.models import promociones_model
 from datetime import datetime
 
 
@@ -9,7 +9,7 @@ def register_promociones_callbacks(app):
 
     # ---------- Renderizar tabla ----------
     def render_tabla():
-        registros = promociones.get_all_promociones()
+        registros = promociones_model.get_all_promociones()
         if not registros:
             return dmc.Alert("No hay promociones registradas.", color="yellow", variant="filled")
 
@@ -107,14 +107,14 @@ def register_promociones_callbacks(app):
             return no_update, no_update, no_update, no_update, no_update, no_update, no_update
 
         if hidden_id:  # UPDATE
-            promociones.actualizar_promocion(hidden_id, {
+            promociones_model.actualizar_promocion(hidden_id, {
                 "nombre": nombre,
                 "tipo": tipo,
                 "codigo_padre": codigo_padre,
                 "id_campania": id_campania
             })
         else:  # INSERT
-            promociones.crear_promocion(nombre, tipo, codigo_padre, id_campania)
+            promociones_model.crear_promocion(nombre, tipo, codigo_padre, id_campania)
 
         return render_tabla(), False, "", None, None, None, None
 
@@ -136,7 +136,7 @@ def register_promociones_callbacks(app):
         if not pos:
             return no_update
 
-        promociones.eliminar_promocion(idx)
+        promociones_model.eliminar_promocion(idx)
         return render_tabla()
 
     # ---------- Abrir modal "nuevo" ----------
@@ -176,7 +176,7 @@ def register_promociones_callbacks(app):
         if not pos:
             return no_update, no_update, no_update, no_update, no_update, no_update
 
-        registro = promociones.get_promocion(idx)
+        registro = promociones_model.get_promocion(idx)
         return True, registro["nombre"], registro["tipo"], registro.get("codigo_padre"), registro.get("id_campania"), registro["id"]
 
     # ---------- Cancelar modal ----------

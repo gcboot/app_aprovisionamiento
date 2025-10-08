@@ -1,6 +1,6 @@
 from dash import Input, Output, State, ALL, ctx, no_update, html
 import dash_mantine_components as dmc
-from src.models import campanias
+from src.models import campanias_model
 from datetime import datetime
 
 
@@ -17,7 +17,7 @@ def register_campanias_callbacks(app):
 
     # ---------- Renderizar tabla ----------
     def render_tabla_campanias():
-        camps = campanias.get_campanias()
+        camps = campanias_model.get_campanias()
         if not camps:
             return dmc.Alert(
                 "No hay campañas registradas.",
@@ -101,7 +101,7 @@ def register_campanias_callbacks(app):
     def actualizar_tabla_campanias(_, refresh_trigger, __):
         triggered = ctx.triggered_id
         if isinstance(triggered, dict) and "index" in triggered:  # eliminar
-            campanias.delete_campania(triggered["index"])
+            campanias_model.delete_campania(triggered["index"])
         return render_tabla_campanias()
 
     # ---------- Manejar modal (crear / editar / guardar) ----------
@@ -136,7 +136,7 @@ def register_campanias_callbacks(app):
 
         # ✏️ EDITAR → abrir modal con datos existentes
         if isinstance(triggered, dict) and "index" in triggered and n_editar and any(n_editar):
-            camp = next((c for c in campanias.get_campanias() if c["id"] == triggered["index"]), None)
+            camp = next((c for c in campanias_model.get_campanias() if c["id"] == triggered["index"]), None)
             if camp:
                 return True, camp["campania"], camp["anio"], camp.get("fecha_inicio", ""), camp.get("fecha_fin", ""), camp.get("estado", ""), camp["id"], no_update, no_update
 
@@ -156,10 +156,10 @@ def register_campanias_callbacks(app):
                 )
 
             if edit_id:  # actualizar
-                campanias.update_campania(edit_id, numero, anio, fecha_inicio, fecha_fin, estado)
+                campanias_model.update_campania(edit_id, numero, anio, fecha_inicio, fecha_fin, estado)
                 mensaje = "✅ Campaña actualizada con éxito"
             else:       # insertar
-                campanias.insert_campania(numero, anio, fecha_inicio, fecha_fin, estado)
+                campanias_model.insert_campania(numero, anio, fecha_inicio, fecha_fin, estado)
                 mensaje = "✅ Campaña creada con éxito"
 
             return (

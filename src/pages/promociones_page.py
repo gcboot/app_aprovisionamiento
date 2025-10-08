@@ -2,7 +2,7 @@ import dash
 from dash import html
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
-from src.models import campanias
+from src.models import campanias_model
 from src.components.layout_base import layout_base  # tu layout base
 
 # Registrar página
@@ -73,7 +73,7 @@ def layout():
                     label="Campaña",
                     placeholder="Seleccione campaña",
                     data=[{"label": f"C{c['campania']} - {c['anio']}", "value": str(c["id"])}
-                          for c in campanias.get_campanias()],
+                          for c in campanias_model.get_campanias()],
                     required=True,
                     mb=20,
                     persistence=True
